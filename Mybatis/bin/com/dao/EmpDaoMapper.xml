@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 步骤5 创建SQL的映射文件 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.IEmpDao">
+	<!-- 优化代码映射管理，一次设置，下面可优化重复使用 -->
+	<resultMap id="empResultMap" type="com.entity.Emp">
+		<id property="empno" column="empno" />
+		<result property="empName" column="ename" />
+		<result property="hireDate" column="hiredate" />
+		<result property="job" column="job" />
+		<result property="salary" column="sal" />
+		<!-- 别名储存数据，数据库取出的数据为column栏目命名，根据部分在实体类中的命名进行对应 -->
+		<result property="comm" column="comm" />
+		<result property="mgr" column="mgr" />
+		<result property="deptNo" column="deptno" />
+	</resultMap>
+
+	<select id="selectAll" resultType="Emp" resultMap="empResultMap">
+		SELECT
+		*
+		FROM
+		EMP
+	</select>
+
+	<select id="selectOne" resultType="Emp" resultMap="empResultMap">
+		SELECT
+		*
+		FROM
+		EMP where empno = 7934
+	</select>
+
+	<select id="selectOneByEmpno" resultType="Emp" parameterType="int"
+		resultMap="empResultMap">
+		SELECT
+		*
+		FROM EMP where empno = #{i}
+	</select>
+	
+	<select id="count"  resultType="int">
+		SELECT COUNT(*) FROM EMP
+	</select>
+	
+	   
+<!--    <select id="findEmpByExampleIf" parameterType="Emp" resultMap="empResultMap">
+  		SELECT * FROM EMP WHERE 1 = 1
+  		<if test ="deptNo != null">   
+  			and deptno= #{deptNo}
+  		</if>
+  		<if test ="empName != null">
+  			and ename like '%${empName}%'
+  		</if>
+  </select> -->
+  
+  
+  <!-- 代码优化 -->
+   <select id="findEmpByExampleIf" parameterType="Emp" resultMap="empResultMap">
+  		SELECT * FROM EMP
+  		<where>
+  		<if test ="deptNo != null">   
+  			and deptno= #{deptNo}
+  		</if>
+  		<if test ="empName != null">
+  			and ename like '%${empName}%'
+  		</if>
+  		</where>
+  </select>
+  
+	
+
+	<insert id="insertEmp" parameterType="Emp">
+		insert into emp
+		values
+		(#{empno},#{empName},#{job},#{mgr},#{hireDate},#{salary},#{comm},#{deptNo})
+	</insert>
+
+	<insert id="insertEmpAutoId" parameterType="Emp"
+		useGeneratedKeys="true" keyProperty="empno">
+		insert into emp(ename,job,mgr,hiredate,sal,comm,deptno)
+		values
+		(#{empName},#{job},#{mgr},#{hireDate},#{salary},#{comm},#{deptNo})
+	</insert>
+	
+	<delete id ="deleteEmp" parameterType="int">
+		delete from emp where empno =#{i}
+	</delete>
+
+	<update id="updateNameById" parameterType="Emp" >
+		UPDATE EMP SET ename = #{empName} WHERE empno = #{empno}
+	</update>
+
+</mapper>
